@@ -1,24 +1,29 @@
 package com.aribanilia.vaadin.model;
 
 import com.aribanilia.vaadin.service.UserServices;
-import com.aribanilia.vaadin.util.VConstants;
 import com.vaadin.annotations.Theme;
+import com.vaadin.annotations.Title;
 import com.vaadin.navigator.Navigator;
+import com.vaadin.server.Responsive;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.spring.annotation.SpringUI;
 import com.vaadin.ui.UI;
+import com.vaadin.ui.themes.ValoTheme;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 
 @SpringUI
-@Theme("valo")
+@Theme(ValoTheme.THEME_NAME)
+@Title("Vaadin Spring")
 public class VaadinUI extends UI {
 
     @Autowired private UserServices servicesUser;
+
     private Navigator navigator;
 
     @Override
     protected void init(VaadinRequest request) {
+        Responsive.makeResponsive(this);
+
         // Initializer All UI
         navigator = new Navigator(this, this);
 
@@ -26,14 +31,17 @@ public class VaadinUI extends UI {
         navigator.addView(LoginPage.VIEW_NAME, login);
         navigator.setErrorView(LoginPage.class);
 
-        router();
+        updateContent();
     }
 
-    private void router() {
+    private void updateContent() {
         if (getSession().getAttribute("user") != null) {
-            getNavigator().navigateTo(LandingPage.VIEW_NAME);
+            // Authenticated user
+            removeStyleName("loginview");
+            getNavigator().navigateTo(getNavigator().getState());
         } else {
             getNavigator().navigateTo(LoginPage.VIEW_NAME);
+            addStyleName("loginview");
         }
     }
 }
