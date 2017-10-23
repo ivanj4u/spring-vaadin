@@ -27,8 +27,7 @@ public class TblUser {
     @Column(name = "status", length = 2)
     private String status;
 
-    public TblUser(String username) {
-        this.username = username;
+    public TblUser(){
     }
 
     public String getUsername() {

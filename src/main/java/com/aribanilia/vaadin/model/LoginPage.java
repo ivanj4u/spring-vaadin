@@ -3,6 +3,7 @@ package com.aribanilia.vaadin.model;
 import com.aribanilia.vaadin.entity.TblUser;
 import com.aribanilia.vaadin.service.UserServices;
 import com.aribanilia.vaadin.util.VConstants;
+import com.aribanilia.vaadin.util.VaadinValidation;
 import com.vaadin.navigator.View;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.spring.annotation.SpringView;
@@ -11,15 +12,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@SpringView
+@SpringView(name = LoginPage.VIEW_NAME)
 public class LoginPage extends VerticalLayout implements View {
 
-    @Autowired private UserServices servicesUser;
-
-    public static final String NAME = "";
+    public static final String VIEW_NAME = "login";
     private static final Logger logger = LoggerFactory.getLogger(LoginPage.class);
 
-    public LoginPage() {
+    @Autowired
+    public LoginPage(UserServices servicesUser) {
         Panel panel = new Panel("Login");
         panel.setSizeUndefined();
         addComponent(panel);
@@ -31,17 +31,23 @@ public class LoginPage extends VerticalLayout implements View {
         content.addComponent(txtPassword);
 
         Button btnLogin = new Button("Login", event -> {
-            TblUser user = servicesUser.login(txtUsername.getValue().toUpperCase(), txtPassword.getValue());
-            if (user != null) {
-                if (VConstants.STATUS_USER.ACTIVE.equals(user.getStatus())) {
-                    VaadinSession.getCurrent().setAttribute("user", user);
+            if (VaadinValidation.validateRequired(txtUsername)
+                    && VaadinValidation.validateRequired(txtPassword)) {
+                TblUser user = servicesUser.login(txtUsername.getValue(), txtPassword.getValue());
+                if (user != null) {
+                    if (VConstants.STATUS_USER.ACTIVE.equals(user.getStatus())) {
+                        VaadinSession.getCurrent().setAttribute("user", user);
+                        LandingPage landing = new LandingPage();
+                        getUI().getNavigator().addView(LandingPage.VIEW_NAME, landing);
+                        getUI().getNavigator().navigateTo(LandingPage.VIEW_NAME);
+                    } else {
+                        logger.error("Status User : " + user.getUsername() + " tidak benar!");
+                        Notification.show("Status User : " + user.getUsername() + " tidak benar!", Notification.Type.ERROR_MESSAGE);
+                    }
                 } else {
-                    logger.error("Status User : " + user.getUsername() + " tidak benar!");
-                    Notification.show("Status User : " + user.getUsername() + " tidak benar!", Notification.Type.ERROR_MESSAGE);
+                    logger.error("User : " + user.getUsername() + " tidak ditemukan!");
+                    Notification.show("User : " + user.getUsername() + " tidak ditemukan!", Notification.Type.ERROR_MESSAGE);
                 }
-            } else {
-                logger.error("User : " + user.getUsername() + " tidak ditemukan!");
-                Notification.show("User : " + user.getUsername() + " tidak ditemukan!", Notification.Type.ERROR_MESSAGE);
             }
         });
 
