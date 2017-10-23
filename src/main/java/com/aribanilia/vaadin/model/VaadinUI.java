@@ -1,5 +1,6 @@
 package com.aribanilia.vaadin.model;
 
+import com.aribanilia.vaadin.entity.TblUser;
 import com.aribanilia.vaadin.service.UserServices;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
@@ -35,7 +36,7 @@ public class VaadinUI extends UI {
     }
 
     private void updateContent() {
-        if (getSession().getAttribute("user") != null) {
+        if (getSession().getAttribute(TblUser.class.getName()) != null) {
             // Authenticated user
             removeStyleName("loginview");
             getNavigator().navigateTo(getNavigator().getState());

@@ -79,7 +79,7 @@ public class LoginPage extends VerticalLayout implements View {
                 TblUser user = servicesUser.login(txtUsername.getValue(), txtPassword.getValue());
                 if (user != null) {
                     if (VConstants.STATUS_USER.ACTIVE.equals(user.getStatus())) {
-                        VaadinSession.getCurrent().setAttribute("user", user);
+                        VaadinSession.getCurrent().setAttribute(TblUser.class.getName(), user);
                         LandingPage landing = new LandingPage();
                         getUI().getNavigator().addView(LandingPage.VIEW_NAME, landing);
                         getUI().getNavigator().navigateTo(LandingPage.VIEW_NAME);
