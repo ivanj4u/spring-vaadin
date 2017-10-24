@@ -1,6 +1,8 @@
 package com.aribanilia.vaadin.model;
 
 import com.aribanilia.vaadin.entity.TblUser;
+import com.aribanilia.vaadin.loader.MenuLoader;
+import com.aribanilia.vaadin.service.MenuServices;
 import com.aribanilia.vaadin.service.UserServices;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.Title;
@@ -18,12 +20,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class VaadinUI extends UI {
 
     @Autowired private UserServices servicesUser;
+    @Autowired private MenuServices servicesMenu;
 
     private Navigator navigator;
 
     @Override
     protected void init(VaadinRequest request) {
         Responsive.makeResponsive(this);
+
+        // Initializer Menu
+        MenuLoader menuLoader = new MenuLoader(servicesUser, servicesMenu);
 
         // Initializer All UI
         navigator = new Navigator(this, this);

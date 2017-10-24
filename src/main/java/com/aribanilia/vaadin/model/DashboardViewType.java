@@ -17,7 +17,7 @@ public enum DashboardViewType {
     private final Resource icon;
     private final boolean stateful;
 
-    private DashboardViewType(final String viewName,
+    DashboardViewType(final String viewName,
                               final Class<? extends View> viewClass, final Resource icon,
                               final boolean stateful) {
         this.viewName = viewName;

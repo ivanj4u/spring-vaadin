@@ -4,7 +4,9 @@
 
 package com.aribanilia.vaadin.model;
 
+import com.aribanilia.vaadin.entity.TblMenu;
 import com.aribanilia.vaadin.entity.TblUser;
+import com.aribanilia.vaadin.loader.MenuLoader;
 import com.vaadin.navigator.View;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.ThemeResource;
@@ -36,7 +38,6 @@ public class LandingPage extends CustomComponent implements View {
         setPrimaryStyleName("valo-menu");
         setId(ID);
         setSizeUndefined();
-
 
         setCompositionRoot(buildContent());
     }
@@ -124,33 +125,21 @@ public class LandingPage extends CustomComponent implements View {
     private Component buildMenuItems() {
         CssLayout menuItemsLayout = new CssLayout();
         menuItemsLayout.addStyleName("valo-menuitems");
-
-        for (final DashboardViewType view : DashboardViewType.values()) {
-            Component menuItemComponent = new ValoMenuItemButton(view);
-
-            if (view == DashboardViewType.REPORTS) {
-                // Add drop target to reports button
-                DragAndDropWrapper reports = new DragAndDropWrapper(
-                        menuItemComponent);
-                reports.setSizeUndefined();
-                reports.setDragStartMode(DragAndDropWrapper.DragStartMode.NONE);
-                menuItemComponent = reports;
+        MenuLoader loader = (MenuLoader) VaadinSession.getCurrent().getAttribute(MenuLoader.class.getName());
+        try {
+            for (final TblMenu view : loader.getAuthorizedMenu()) {
+                AbstractScreen screen = loader.getScreen(view.getMenuId());
+                if (screen == null) {
+                    logger.error("Screen Error : " + view.getMenuClass());
+                    continue;
+                }
+                getUI().getNavigator().addView(view.getMenuId(), screen);
+                Component menuItemComponent = new ValoMenuItemButton(view);
+                menuItemsLayout.addComponent(menuItemComponent);
             }
-
-            if (view == DashboardViewType.DASHBOARD) {
-                notificationsBadge = new Label();
-                notificationsBadge.setId(NOTIFICATIONS_BADGE_ID);
-                menuItemComponent = buildBadgeWrapper(menuItemComponent,
-                        notificationsBadge);
-            }
-            if (view == DashboardViewType.REPORTS) {
-                reportsBadge = new Label();
-                reportsBadge.setId(REPORTS_BADGE_ID);
-                menuItemComponent = buildBadgeWrapper(menuItemComponent,
-                        reportsBadge);
-            }
-
-            menuItemsLayout.addComponent(menuItemComponent);
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage());
         }
         return menuItemsLayout;
 
@@ -174,23 +163,16 @@ public class LandingPage extends CustomComponent implements View {
     }
 
     public final class ValoMenuItemButton extends Button {
+        private final TblMenu view;
 
-        private static final String STYLE_SELECTED = "selected";
-
-        private final DashboardViewType view;
-
-        public ValoMenuItemButton(final DashboardViewType view) {
+        public ValoMenuItemButton(final TblMenu view) {
             this.view = view;
             setPrimaryStyleName("valo-menu-item");
-            setIcon(view.getIcon());
-            setCaption(view.getViewName().substring(0, 1).toUpperCase()
-                    + view.getViewName().substring(1));
-            addClickListener(new ClickListener() {
-                @Override
-                public void buttonClick(final ClickEvent event) {
-                    UI.getCurrent().getNavigator()
-                            .navigateTo(view.getViewName());
-                }
+            setCaption(view.getMenuName().substring(0, 1).toUpperCase()
+                    + view.getMenuName().substring(1));
+            addClickListener(event -> {
+                UI.getCurrent().getNavigator()
+                        .navigateTo(view.getMenuId());
             });
 
         }

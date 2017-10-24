@@ -1,14 +1,28 @@
 package com.aribanilia.vaadin.view;
 
-import com.vaadin.navigator.View;
-import com.vaadin.spring.annotation.SpringView;
+import com.aribanilia.vaadin.model.AbstractScreen;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.VerticalLayout;
 
-@SpringView
-public class ReportsView extends VerticalLayout implements View {
+public class ReportsView extends AbstractScreen {
 
-    public ReportsView() {
-        addComponent(new Label("Reports View"));
+
+    @Override
+    protected void initComponents() {
+        setContent(new Label("Report View"));
+    }
+
+    @Override
+    public void setModeNew() {
+
+    }
+
+    @Override
+    public void setModeUpdate() {
+
+    }
+
+    @Override
+    public void setModeView() {
+
     }
 }

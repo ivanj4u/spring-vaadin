@@ -1,6 +1,7 @@
 package com.aribanilia.vaadin.model;
 
 import com.aribanilia.vaadin.entity.TblUser;
+import com.aribanilia.vaadin.loader.MenuLoader;
 import com.aribanilia.vaadin.service.UserServices;
 import com.aribanilia.vaadin.util.VConstants;
 import com.aribanilia.vaadin.util.VaadinValidation;
@@ -32,6 +33,7 @@ public class LoginPage extends VerticalLayout implements View {
         setSizeFull();
         setMargin(false);
         setSpacing(true);
+        Responsive.makeResponsive(this);
 
         Component loginForm = buildLoginForm();
         addComponent(loginForm);
@@ -80,6 +82,8 @@ public class LoginPage extends VerticalLayout implements View {
                 if (user != null) {
                     if (VConstants.STATUS_USER.ACTIVE.equals(user.getStatus())) {
                         VaadinSession.getCurrent().setAttribute(TblUser.class.getName(), user);
+                        MenuLoader loader = (MenuLoader) VaadinSession.getCurrent().getAttribute(MenuLoader.class.getName());
+                        loader.setAuthorizedMenu(user);
                         LandingPage landing = new LandingPage();
                         getUI().getNavigator().addView(LandingPage.VIEW_NAME, landing);
                         getUI().getNavigator().navigateTo(LandingPage.VIEW_NAME);
