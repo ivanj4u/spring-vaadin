@@ -7,7 +7,7 @@ package com.aribanilia.vaadin.util;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Notification;
 
-public class VaadinValidation {
+public class ValidationHelper {
 
     public static boolean validateRequired(AbstractField field) {
         if (field.getValue() == null || field.getValue().toString().equals("")) {

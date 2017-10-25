@@ -1,10 +1,8 @@
 package com.aribanilia.vaadin.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 
 @Entity
 @Table(name = "tbl_user", schema = "vaadin")
@@ -27,6 +25,17 @@ public class TblUser extends AuditTrail implements Serializable {
      */
     @Column(name = "status", length = 2)
     private String status;
+    @Temporal(TemporalType.DATE)
+    @Column(name = "start_time")
+    private Date startTime;
+    @Temporal(TemporalType.DATE)
+    @Column(name = "end_time")
+    private Date endTime;
+    @Column(name = "login_fail_count", length = 2)
+    private Integer loginFailCount;
+    @Temporal(TemporalType.DATE)
+    @Column(name = "last_login")
+    private Date lastLogin;
 
     public TblUser(){
     }
@@ -87,5 +96,37 @@ public class TblUser extends AuditTrail implements Serializable {
      */
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
+    }
+
+    public Integer getLoginFailCount() {
+        return loginFailCount;
+    }
+
+    public void setLoginFailCount(Integer loginFailCount) {
+        this.loginFailCount = loginFailCount;
+    }
+
+    public Date getLastLogin() {
+        return lastLogin;
+    }
+
+    public void setLastLogin(Date lastLogin) {
+        this.lastLogin = lastLogin;
     }
 }

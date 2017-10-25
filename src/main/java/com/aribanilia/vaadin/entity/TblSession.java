@@ -4,10 +4,11 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "tbl_session", schema = "vaadin")
-public class TblSession extends AuditTrail {
+public class TblSession extends AuditTrail implements Serializable {
 
     @Id @Column(name = "username", length = 20, nullable = false)
     private String username;

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <property name="show_sql">true</property>
+        <property name="max_fetch_depth">2</property>
+        <property name="default_batch_fetch_size">16</property>
+        <property name="jdbc.use_streams_for_binary">true</property>
+        <property name="connection.isolation">2</property>
+        <property name="hibernate.bytecode.use_reflection_optimizer">false</property>
+        <property name="hibernate.transaction.flush_before_completion">true</property>
+        <property name="hibernate.hbm2ddl.auto">update</property>
+        <!-- MySQL -->
+        <!--<property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>-->
+        <!--<property name="hibernate.connection.url">jdbc:mysql://localhost:3306/vaadin</property>-->
+        <!--<property name="hibernate.connection.username">vspring</property>-->
+        <!--<property name="hibernate.connection.password">vspring</property>-->
+        <!--<property name="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</property>-->
+
+        <!-- PostgreSQL -->
+        <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
+        <property name="hibernate.connection.url">jdbc:postgresql://ec2-54-235-90-125.compute-1.amazonaws.com:5432/d6u1094pg8r8e2</property>
+        <property name="hibernate.connection.username">lsufovqvjdvwgq</property>
+        <property name="hibernate.connection.password">920b64afde6ee6adb9b16ff2047205d35a13db6fda359d089b737dba372488dd</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQL9Dialect</property>
+
+
+        <!-- Table Mapping -->
+        <mapping class="com.aribanilia.vaadin.entity.TblGroup"/>
+        <mapping class="com.aribanilia.vaadin.entity.TblMenu"/>
+        <mapping class="com.aribanilia.vaadin.entity.TblParam"/>
+        <mapping class="com.aribanilia.vaadin.entity.TblPriviledge"/>
+        <mapping class="com.aribanilia.vaadin.entity.TblSession"/>
+        <mapping class="com.aribanilia.vaadin.entity.TblUser"/>
+        <mapping class="com.aribanilia.vaadin.entity.TblUserGroup"/>
+
+    </session-factory>
+</hibernate-configuration>

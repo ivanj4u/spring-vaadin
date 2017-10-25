@@ -1,6 +1,6 @@
 package com.aribanilia.vaadin.util;
 
-public class VConstants {
+public class Constants {
 
     public static final String APPLICATION_NAME = "Vaading Spring";
 

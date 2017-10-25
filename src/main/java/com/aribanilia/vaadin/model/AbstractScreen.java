@@ -89,7 +89,7 @@ public abstract class AbstractScreen extends Panel implements PriviledgeModel, V
 
     @Override
     public boolean isAuthorizedToView() {
-        MenuLoader loader = (MenuLoader) VaadinSession.getCurrent().getAttribute(MenuLoader.class.getName());
+        MenuLoader loader = VaadinSession.getCurrent().getAttribute(MenuLoader.class);
         return loader.getPriviledge(getClass().getName()) != null
                 ? loader.getPriviledge(getClass().getName()).getIsView() == '1' : false;
     }
@@ -97,7 +97,7 @@ public abstract class AbstractScreen extends Panel implements PriviledgeModel, V
     @Override
     public boolean isAuthorizedToUpdate() {
         boolean b = false;
-        MenuLoader loader = (MenuLoader) VaadinSession.getCurrent().getAttribute(MenuLoader.class.getName());
+        MenuLoader loader = VaadinSession.getCurrent().getAttribute(MenuLoader.class);
         if (loader.getPriviledge(getClass().getName()) != null) {
             b = loader.getPriviledge(getClass().getName()).getIsUpdate() == '1';
         }
@@ -106,14 +106,14 @@ public abstract class AbstractScreen extends Panel implements PriviledgeModel, V
 
     @Override
     public boolean isAuthorizedToDelete() {
-        MenuLoader loader = (MenuLoader) VaadinSession.getCurrent().getAttribute(MenuLoader.class.getName());
+        MenuLoader loader = VaadinSession.getCurrent().getAttribute(MenuLoader.class);
         return loader.getPriviledge(getClass().getName()) != null
                 ? loader.getPriviledge(getClass().getName()).getIsDelete() == '1' : false;
     }
 
     @Override
     public boolean isAuthorizedToAdd() {
-        MenuLoader loader = (MenuLoader) VaadinSession.getCurrent().getAttribute(MenuLoader.class.getName());
+        MenuLoader loader = VaadinSession.getCurrent().getAttribute(MenuLoader.class);
         return loader.getPriviledge(getClass().getName()) == null
                 || (loader.getPriviledge(getClass().getName()) != null && loader.getPriviledge(getClass().getName())
                 .getIsAdd() == '1');

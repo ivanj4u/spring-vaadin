@@ -4,30 +4,39 @@ import com.aribanilia.vaadin.entity.TblMenu;
 import com.aribanilia.vaadin.entity.TblPriviledge;
 import com.aribanilia.vaadin.entity.TblUser;
 import com.aribanilia.vaadin.entity.TblUserGroup;
+import com.aribanilia.vaadin.framework.HibernateUtil;
+import com.aribanilia.vaadin.framework.LoginUtil;
 import com.aribanilia.vaadin.model.AbstractScreen;
-import com.aribanilia.vaadin.service.MenuServices;
-import com.aribanilia.vaadin.service.UserServices;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Notification;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class MenuLoader {
-    private UserServices servicesUser;
-    private MenuServices servicesMenu;
-    private static Vector<TblMenu> v = new Vector<TblMenu>();
-    private Vector<TblMenu> vSessionedPerUser = new Vector<TblMenu>();
+    private static Vector<TblMenu> v = new Vector<>();
+    private Vector<TblMenu> vSessionedPerUser = new Vector<>();
     private ConcurrentHashMap<String, AbstractScreen> cacheClass = new ConcurrentHashMap<>();
 
-    @Autowired
-    public MenuLoader(UserServices servicesUser, MenuServices servicesMenu) {
-        this.servicesUser = servicesUser;
-        this.servicesMenu = servicesMenu;
-        List<TblMenu> list = servicesMenu.getAllMenu();
-        v.clear();
-        v.addAll(list);
+    public static void load() {
+        Session session = null;
+        try {
+            session = HibernateUtil.getSessionFactory().openSession();
+            Criteria criteria = session.createCriteria(TblMenu.class);
+            List<TblMenu> list = criteria.addOrder(Order.asc("parentId")).addOrder(Order.asc("position")).list();
+            v.clear();
+            v.addAll(list);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (session != null && session.isOpen()) {
+                session.close();
+            }
+        }
     }
 
     public AbstractScreen getScreen(String menuId) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
@@ -35,14 +44,13 @@ public class MenuLoader {
             if (menu.getMenuId().equals(menuId)) {
                 if (menu.getMenuClass() == null || menu.getHaveChild().equals("1"))
                     return null;
-                TblUser user = (TblUser) VaadinSession.getCurrent().getSession().getAttribute(TblUser.class.getName());
+                TblUser user = VaadinSession.getCurrent().getAttribute(TblUser.class);
                 String sessionId = VaadinSession.getCurrent().getSession().getId();
-                if (!this.servicesUser.sessionCheck(user.getUsername(), sessionId)) {
+                if (!LoginUtil.sessionCheck(user.getUsername(), sessionId)) {
                     Notification.show("Anda telah keluar", "Anda Telah Keluar/Login dari Komputer Lain!", Notification.Type.HUMANIZED_MESSAGE);
                     VaadinSession.getCurrent().close();
                     return null;
                 }
-
                 AbstractScreen obj = cacheClass.get(menu.getMenuId());
                 if (obj != null)
                     return obj;
@@ -71,15 +79,19 @@ public class MenuLoader {
     private Hashtable<String, TblPriviledge> hSessionedMenuperUser = new Hashtable<>();
     private Hashtable<String, TblPriviledge> hSessionedMenuperUser2 = new Hashtable<>();
 
-    public void setAuthorizedMenu(TblUser user) {
+    public void setAuthorizedMenu(Session session, TblUser user) {
         hSessionedMenuperUser.clear();
         vSessionedPerUser.removeAllElements();
         vSessionedPerUser.addAll(v);
         Vector<TblMenu> vTemp = new Vector<>();
 
-        List<TblUserGroup> userGroups = servicesUser.getUserGroup(user.getUsername());
+        Criteria criteria = session.createCriteria(TblUserGroup.class);
+        criteria.add(Restrictions.eq("username", user.getUsername()));
+        List<TblUserGroup> userGroups = criteria.list();
         for (TblUserGroup userGroup : userGroups) {
-            List<TblPriviledge> priviledges = servicesUser.getGroupPriviledge(userGroup.getGroupId());
+            criteria = session.createCriteria(TblPriviledge.class);
+            criteria.add(Restrictions.eq("groupId", userGroup.getGroupId()));
+            List<TblPriviledge> priviledges = criteria.list();
             for (TblPriviledge p : priviledges) {
                 TblPriviledge privPrev = hSessionedMenuperUser.get(p.getMenuId());
                 if (privPrev != null) {
@@ -93,9 +105,8 @@ public class MenuLoader {
                         privPrev.setIsView(p.getIsView());
                 } else {
                     hSessionedMenuperUser.put(p.getMenuId(), p);
-                    TblMenu menu = servicesMenu.getMenu(p.getMenuId());
+                    TblMenu menu = session.get(TblMenu.class, p.getMenuId());
                     if (menu != null && menu.getMenuClass() != null) {
-
                         hSessionedMenuperUser2.put(menu.getMenuClass(), p);
                     }
                     vTemp.add(menu);

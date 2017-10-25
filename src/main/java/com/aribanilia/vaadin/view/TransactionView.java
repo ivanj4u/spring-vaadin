@@ -6,7 +6,7 @@ import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
 
-public class TransactionsView extends AbstractScreen {
+public class TransactionView extends AbstractScreen {
 
 
     @Override

@@ -17,11 +17,9 @@ import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @SpringView(name = LandingPage.VIEW_NAME)
 public class LandingPage extends CustomComponent implements View {
-    private TblUser user;
     public static final String VIEW_NAME = "landing";
     private static final Logger logger = LoggerFactory.getLogger(LandingPage.class);
 
@@ -33,7 +31,6 @@ public class LandingPage extends CustomComponent implements View {
     private Label reportsBadge;
     private MenuBar.MenuItem settingsItem;
 
-    @Autowired
     public LandingPage() {
         setPrimaryStyleName("valo-menu");
         setId(ID);
@@ -71,8 +68,7 @@ public class LandingPage extends CustomComponent implements View {
     }
 
     private TblUser getCurrentUser() {
-        return (TblUser) VaadinSession.getCurrent()
-                .getAttribute(TblUser.class.getName());
+        return VaadinSession.getCurrent().getAttribute(TblUser.class);
     }
 
     private Component buildUserMenu() {
@@ -81,27 +77,19 @@ public class LandingPage extends CustomComponent implements View {
         final TblUser user = getCurrentUser();
         settingsItem = settings.addItem("",
                 new ThemeResource("img/profile-pic-300px.jpg"), null);
-        settingsItem.addItem("Edit Profile", new MenuBar.Command() {
-            @Override
-            public void menuSelected(final MenuBar.MenuItem selectedItem) {
+        settingsItem.addItem("Edit Profile", (MenuBar.Command) selectedItem -> {
 //                ProfilePreferencesWindow.open(user, false);
-                Notification.show("Edit Profile Clicked");
-            }
+            Notification.show("Edit Profile Clicked");
         });
-        settingsItem.addItem("Preferences", new MenuBar.Command() {
-            @Override
-            public void menuSelected(final MenuBar.MenuItem selectedItem) {
+        settingsItem.addItem("Preferences", (MenuBar.Command) selectedItem -> {
 //                ProfilePreferencesWindow.open(user, true);
-                Notification.show("Preferences Clicked");
-            }
+            Notification.show("Preferences Clicked");
         });
         settingsItem.addSeparator();
-        settingsItem.addItem("Sign Out", new MenuBar.Command() {
-            @Override
-            public void menuSelected(final MenuBar.MenuItem selectedItem) {
-                VaadinSession.getCurrent().setAttribute(TblUser.class.getName(), null);
-                getUI().getNavigator().navigateTo(LoginPage.VIEW_NAME);
-            }
+        settingsItem.addItem("Sign Out", (MenuBar.Command) selectedItem -> {
+            VaadinSession.getCurrent().setAttribute(TblUser.class, null);
+            getUI().getNavigator().removeView(LandingPage.VIEW_NAME);
+            getUI().getNavigator().navigateTo(LoginPage.VIEW_NAME);
         });
         return settings;
     }
@@ -125,15 +113,15 @@ public class LandingPage extends CustomComponent implements View {
     private Component buildMenuItems() {
         CssLayout menuItemsLayout = new CssLayout();
         menuItemsLayout.addStyleName("valo-menuitems");
-        MenuLoader loader = (MenuLoader) VaadinSession.getCurrent().getAttribute(MenuLoader.class.getName());
         try {
-            for (final TblMenu view : loader.getAuthorizedMenu()) {
-                AbstractScreen screen = loader.getScreen(view.getMenuId());
+            MenuLoader menuLoader = VaadinSession.getCurrent().getAttribute(MenuLoader.class);
+            for (final TblMenu view : menuLoader.getAuthorizedMenu()) {
+                AbstractScreen screen = menuLoader.getScreen(view.getMenuId());
                 if (screen == null) {
                     logger.error("Screen Error : " + view.getMenuClass());
                     continue;
                 }
-                getUI().getNavigator().addView(view.getMenuId(), screen);
+                UI.getCurrent().getNavigator().addView(view.getMenuId(), screen);
                 Component menuItemComponent = new ValoMenuItemButton(view);
                 menuItemsLayout.addComponent(menuItemComponent);
             }
@@ -165,14 +153,14 @@ public class LandingPage extends CustomComponent implements View {
     public final class ValoMenuItemButton extends Button {
         private final TblMenu view;
 
-        public ValoMenuItemButton(final TblMenu view) {
-            this.view = view;
+        public ValoMenuItemButton(final TblMenu menu) {
+            this.view = menu;
             setPrimaryStyleName("valo-menu-item");
-            setCaption(view.getMenuName().substring(0, 1).toUpperCase()
-                    + view.getMenuName().substring(1));
+            setCaption(menu.getMenuName().substring(0, 1).toUpperCase()
+                    + menu.getMenuName().substring(1));
             addClickListener(event -> {
                 UI.getCurrent().getNavigator()
-                        .navigateTo(view.getMenuId());
+                        .navigateTo(menu.getMenuId());
             });
 
         }
