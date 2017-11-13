@@ -13,18 +13,18 @@
         <property name="hibernate.transaction.flush_before_completion">true</property>
         <property name="hibernate.hbm2ddl.auto">update</property>
         <!-- MySQL -->
-        <!--<property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>-->
-        <!--<property name="hibernate.connection.url">jdbc:mysql://localhost:3306/vaadin</property>-->
-        <!--<property name="hibernate.connection.username">vspring</property>-->
-        <!--<property name="hibernate.connection.password">vspring</property>-->
-        <!--<property name="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</property>-->
+        <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+        <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/vaadin</property>
+        <property name="hibernate.connection.username">vspring</property>
+        <property name="hibernate.connection.password">vspring</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</property>
 
         <!-- PostgreSQL -->
-        <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
-        <property name="hibernate.connection.url">jdbc:postgresql://ec2-54-235-90-125.compute-1.amazonaws.com:5432/d6u1094pg8r8e2</property>
-        <property name="hibernate.connection.username">lsufovqvjdvwgq</property>
-        <property name="hibernate.connection.password">920b64afde6ee6adb9b16ff2047205d35a13db6fda359d089b737dba372488dd</property>
-        <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQL9Dialect</property>
+        <!--<properties name="hibernate.connection.driver_class">org.postgresql.Driver</properties>-->
+        <!--<properties name="hibernate.connection.url">jdbc:postgresql://ec2-54-235-90-125.compute-1.amazonaws.com:5432/d6u1094pg8r8e2</properties>-->
+        <!--<properties name="hibernate.connection.username">lsufovqvjdvwgq</properties>-->
+        <!--<properties name="hibernate.connection.password">920b64afde6ee6adb9b16ff2047205d35a13db6fda359d089b737dba372488dd</properties>-->
+        <!--<properties name="hibernate.dialect">org.hibernate.dialect.PostgreSQL9Dialect</properties>-->
 
 
         <!-- Table Mapping -->

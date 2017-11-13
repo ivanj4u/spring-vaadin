@@ -1,8 +1,8 @@
 package com.aribanilia.vaadin.framework;
 
 import com.aribanilia.vaadin.entity.TblSession;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+import com.aribanilia.vaadin.framework.db.hibernate.Session;
+import com.aribanilia.vaadin.framework.db.plugin.PersistentPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,17 +14,19 @@ public class LoginUtil {
 
     public static void sessionLogin(Session session, String username, String sessionId, String ip) {
         logger.info("Start Services sessionLogin : " + username);
-        TblSession obj = session.get(TblSession.class, username);
+        TblSession obj = (TblSession) session.get(TblSession.class, username);
         if (obj == null) {
             obj = new TblSession();
             obj.setUsername(username);
             obj.setIp(ip);
             obj.setSessionId(sessionId);
-            obj.setAuditCreate(username);
+            obj.setCreateBy(username);
+            obj.setCreateDate(new Date());
         } else {
             obj.setIp(ip);
             obj.setSessionId(sessionId);
-            obj.setAuditUpdate(username);
+            obj.setUpdateBy(username);
+            obj.setUpdateDate(new Date());
         }
         session.saveOrUpdate(obj);
         logger.info("End Services sessionLogin : " + username);
@@ -35,8 +37,8 @@ public class LoginUtil {
         boolean valid = true;
         Session session = null;
         try {
-            session = HibernateUtil.getSessionFactory().openSession();
-            TblSession tblSession = session.get(TblSession.class, username);
+            session = PersistentPlugin.getSessionFactory().openSession();
+            TblSession tblSession = (TblSession) session.get(TblSession.class, username);
             if (!tblSession.getSessionId().equals(sessionId))
                 valid = false;
         } catch (Exception e) {

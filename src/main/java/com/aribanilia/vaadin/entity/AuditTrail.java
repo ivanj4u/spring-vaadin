@@ -67,15 +67,4 @@ public class AuditTrail implements Serializable {
         this.versi = versi;
     }
 
-    public void setAuditCreate(String createBy) {
-        setCreateBy(createBy);
-        setCreateDate(new Date());
-        setVersi(System.currentTimeMillis());
-    }
-
-    public void setAuditUpdate(String updateBy) {
-        setUpdateBy(updateBy);
-        setUpdateDate(new Date());
-        setVersi(System.currentTimeMillis());
-    }
 }

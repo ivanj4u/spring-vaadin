@@ -1,11 +1,15 @@
-package com.aribanilia.vaadin.model;
+/*
+ * Copyright (c) 2017.
+ */
+
+package com.aribanilia.vaadin.framework;
 
 import com.aribanilia.vaadin.entity.TblUser;
-import com.aribanilia.vaadin.framework.HibernateUtil;
-import com.aribanilia.vaadin.framework.LoginUtil;
+import com.aribanilia.vaadin.framework.db.hibernate.Session;
+import com.aribanilia.vaadin.framework.db.hibernate.Transaction;
+import com.aribanilia.vaadin.framework.db.plugin.PersistentPlugin;
 import com.aribanilia.vaadin.loader.MenuLoader;
 import com.aribanilia.vaadin.loader.ParamLoader;
-import com.aribanilia.vaadin.util.Constants;
 import com.aribanilia.vaadin.util.ValidationHelper;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.navigator.View;
@@ -15,30 +19,33 @@ import com.vaadin.server.Responsive;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.Position;
 import com.vaadin.spring.annotation.SpringView;
+import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.PostConstruct;
 import java.util.Date;
 
+@UIScope
 @SpringView(name = LoginPage.VIEW_NAME)
 public class LoginPage extends VerticalLayout implements View {
     private TextField txtUsername;
     private PasswordField txtPassword;
+    private Button btnLogin;
 
     public static final String VIEW_NAME = "login";
     private static final Logger logger = LoggerFactory.getLogger(LoginPage.class);
 
-    public LoginPage() {
+    @PostConstruct
+    public void init() {
         setSizeFull();
         setMargin(false);
         setSpacing(true);
         Responsive.makeResponsive(this);
 
-        Component loginForm = buildLoginForm();
+        Component loginForm = initComponent();
         addComponent(loginForm);
         setComponentAlignment(loginForm, Alignment.MIDDLE_CENTER);
 
@@ -54,93 +61,83 @@ public class LoginPage extends VerticalLayout implements View {
         notification.show(Page.getCurrent());
     }
 
-    private Component buildLoginForm() {
+    private Component initComponent() {
         final VerticalLayout loginPanel = new VerticalLayout();
         loginPanel.setSizeUndefined();
         loginPanel.setMargin(false);
+        loginPanel.addStyleName(ValoTheme.PANEL_WELL);
         Responsive.makeResponsive(loginPanel);
-        loginPanel.addStyleName("login-panel");
 
-        loginPanel.addComponent(buildLabels());
-        loginPanel.addComponent(buildFields());
+        loginPanel.addComponent(initDetail());
         return loginPanel;
     }
 
-    private Component buildFields() {
-        HorizontalLayout layout = new HorizontalLayout();
-        layout.addStyleName("fields");
+    private Component initDetail() {
+        VerticalLayout layout = new VerticalLayout();
 
-        txtUsername = new TextField("Username");
+        Label title = new Label("Simple Vaadin Application");
+        title.setSizeUndefined();
+        title.addStyleName(ValoTheme.LABEL_H3);
+        title.addStyleName(ValoTheme.LABEL_LIGHT);
+        layout.addComponent(title, 0);
+
+        layout.addComponent(txtUsername = new TextField("Username"));
         txtUsername.setIcon(FontAwesome.USER);
         txtUsername.addStyleName(ValoTheme.TEXTFIELD_INLINE_ICON);
 
-        txtPassword = new PasswordField("Password");
+        layout.addComponent(txtPassword = new PasswordField("Password"));
         txtPassword.setIcon(FontAwesome.LOCK);
         txtPassword.addStyleName(ValoTheme.TEXTFIELD_INLINE_ICON);
 
-        final Button btnLogin = new Button("Login", event -> {
+        layout.addComponent(btnLogin = new Button("Login"));
+        btnLogin.addClickListener(event -> {
             if (ValidationHelper.validateRequired(txtUsername)
                     && ValidationHelper.validateRequired(txtPassword)) {
-                attemptLogin(txtUsername.getValue(), txtPassword.getValue());
+                try {
+                    attemptLogin(txtUsername.getValue(), txtPassword.getValue());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    logger.error(e.getMessage());
+                }
             }
         });
         btnLogin.addStyleName(ValoTheme.BUTTON_PRIMARY);
         btnLogin.setClickShortcut(ShortcutAction.KeyCode.ENTER);
         btnLogin.focus();
 
-        layout.addComponents(txtUsername, txtPassword, btnLogin);
-        layout.setComponentAlignment(btnLogin, Alignment.BOTTOM_LEFT);
-
         return layout;
-    }
-
-    private Component buildLabels() {
-        CssLayout labels = new CssLayout();
-        labels.addStyleName("labels");
-
-        Label welcome = new Label("Selamat Datang");
-        welcome.setSizeUndefined();
-        welcome.addStyleName(ValoTheme.LABEL_H4);
-        welcome.addStyleName(ValoTheme.LABEL_COLORED);
-        labels.addComponent(welcome);
-
-//        Label title = new Label("QuickTickets Dashboard");
-//        title.setSizeUndefined();
-//        title.addStyleName(ValoTheme.LABEL_H3);
-//        title.addStyleName(ValoTheme.LABEL_LIGHT);
-//        labels.addComponent(title);
-        return labels;
     }
 
     private void attemptLogin(String username, String password) {
         try {
             Session session = null;
             try {
-                session = HibernateUtil.getSessionFactory().openSession();
-                TblUser user = session.get(TblUser.class, username);
+                session = PersistentPlugin.getSessionFactory().openSession();
+                TblUser user = (TblUser) session.get(TblUser.class, username);
                 if (user != null) {
                     // Cek Password
                     if (user.getPassword().equals(password)) {
                         if (checkLogin(session, user, true)) {
                             // Set Authorized Menu
-                            VaadinSession.getCurrent().getAttribute(MenuLoader.class).setAuthorizedMenu(session, user);
+                            getSession().getAttribute(MenuLoader.class).setAuthorizedMenu(session, user);
                             // Set User pada Session
-                            VaadinSession.getCurrent().setAttribute(TblUser.class, user);
-                            LandingPage landing = new LandingPage();
-                            getUI().getNavigator().addView(LandingPage.VIEW_NAME, landing);
-                            getUI().getNavigator().navigateTo(LandingPage.VIEW_NAME);
+                            getSession().setAttribute(TblUser.class, user);
+                            // Reset Field
+                            resetField();
+                            // Navigate to MainPage
+                            getUI().getNavigator().navigateTo(MainPage.VIEW_NAME);
                         } else {
                             logger.error("Status User : " + user.getUsername() + " tidak benar!");
-                            failedLogin("Status User : " + user.getUsername() + " tidak benar!");
+                            showFailedLogin("Status User : " + user.getUsername() + " tidak benar!");
                         }
                     } else {
                         // Cek maksimal salah password
                         checkLogin(session, user, false);
-                        failedLogin("Login Gagal!. Username atau Password yang anda masukkan salah!");
+                        showFailedLogin("Login Gagal!. Username atau Password yang anda masukkan salah!");
                     }
                 } else {
                     logger.error("User : " + user.getUsername() + " tidak ditemukan!");
-                    failedLogin("User : " + user.getUsername() + " tidak ditemukan!");
+                    showFailedLogin("User : " + user.getUsername() + " tidak ditemukan!");
                 }
             } catch (Exception e) {
                 if (session != null && session.isOpen())
@@ -154,7 +151,7 @@ public class LoginPage extends VerticalLayout implements View {
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
-            failedLogin("Login Gagal!. Silahkan hubungi administrator!");
+            showFailedLogin("Login Gagal!. Silahkan hubungi administrator!");
         }
     }
 
@@ -166,13 +163,13 @@ public class LoginPage extends VerticalLayout implements View {
                 <= Integer.parseInt(ParamLoader.getParam("MAX.LOGIN.FAIL"));
         b = b && user.getStatus() != null && user.getStatus().equals("1");
         if (!b) {
-            failedLogin("Peringatan, Profil anda diblokir atau tidak aktif. Silahkan hubungi administrator!");
+            showFailedLogin("Peringatan, Profil anda diblokir atau tidak aktif. Silahkan hubungi administrator!");
             valid = false;
         }
         Transaction trx = null;
         try {
             trx = session.beginTransaction();
-            String sessionid = VaadinSession.getCurrent().getSession().getId();
+            String sessionid = getSession().getSession().getId();
             if (valid) {
                 user.setLoginFailCount(0);
                 user.setLastLogin(now);
@@ -190,14 +187,19 @@ public class LoginPage extends VerticalLayout implements View {
             e.printStackTrace();
             if (trx != null)
                 trx.rollback();
+            throw e;
         }
         return valid;
     }
 
-    private void failedLogin(String message) {
+    private void showFailedLogin(String message) {
+        resetField();
+        Notification.show(message, Notification.Type.ERROR_MESSAGE);
+    }
+
+    private void resetField() {
         txtUsername.setValue("");
         txtPassword.setValue("");
-        Notification.show(message, Notification.Type.ERROR_MESSAGE);
     }
 
 }

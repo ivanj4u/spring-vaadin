@@ -1,4 +1,8 @@
-package com.aribanilia.vaadin.model;
+/*
+ * Copyright (c) 2017.
+ */
+
+package com.aribanilia.vaadin.framework;
 
 public interface PriviledgeModel {
 

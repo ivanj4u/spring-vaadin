@@ -4,15 +4,13 @@ import com.aribanilia.vaadin.entity.TblMenu;
 import com.aribanilia.vaadin.entity.TblPriviledge;
 import com.aribanilia.vaadin.entity.TblUser;
 import com.aribanilia.vaadin.entity.TblUserGroup;
-import com.aribanilia.vaadin.framework.HibernateUtil;
+import com.aribanilia.vaadin.framework.AbstractScreen;
 import com.aribanilia.vaadin.framework.LoginUtil;
-import com.aribanilia.vaadin.model.AbstractScreen;
+import com.aribanilia.vaadin.framework.db.hibernate.Criteria;
+import com.aribanilia.vaadin.framework.db.hibernate.Session;
+import com.aribanilia.vaadin.framework.db.plugin.PersistentPlugin;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Notification;
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -22,12 +20,13 @@ public class MenuLoader {
     private Vector<TblMenu> vSessionedPerUser = new Vector<>();
     private ConcurrentHashMap<String, AbstractScreen> cacheClass = new ConcurrentHashMap<>();
 
+    @SuppressWarnings("unchecked")
     public static void load() {
         Session session = null;
         try {
-            session = HibernateUtil.getSessionFactory().openSession();
+            session = PersistentPlugin.getSessionFactory().openSession();
             Criteria criteria = session.createCriteria(TblMenu.class);
-            List<TblMenu> list = criteria.addOrder(Order.asc("parentId")).addOrder(Order.asc("position")).list();
+            List<TblMenu> list = criteria.addOrderBy("parentId").addOrderBy("position").list();
             v.clear();
             v.addAll(list);
         } catch (Exception e) {
@@ -86,11 +85,11 @@ public class MenuLoader {
         Vector<TblMenu> vTemp = new Vector<>();
 
         Criteria criteria = session.createCriteria(TblUserGroup.class);
-        criteria.add(Restrictions.eq("username", user.getUsername()));
+        criteria.getRestriction().eq("username", user.getUsername());
         List<TblUserGroup> userGroups = criteria.list();
         for (TblUserGroup userGroup : userGroups) {
             criteria = session.createCriteria(TblPriviledge.class);
-            criteria.add(Restrictions.eq("groupId", userGroup.getGroupId()));
+            criteria.getRestriction().eq("groupId", userGroup.getGroupId());
             List<TblPriviledge> priviledges = criteria.list();
             for (TblPriviledge p : priviledges) {
                 TblPriviledge privPrev = hSessionedMenuperUser.get(p.getMenuId());
@@ -105,7 +104,7 @@ public class MenuLoader {
                         privPrev.setIsView(p.getIsView());
                 } else {
                     hSessionedMenuperUser.put(p.getMenuId(), p);
-                    TblMenu menu = session.get(TblMenu.class, p.getMenuId());
+                    TblMenu menu = (TblMenu) session.get(TblMenu.class, p.getMenuId());
                     if (menu != null && menu.getMenuClass() != null) {
                         hSessionedMenuperUser2.put(menu.getMenuClass(), p);
                     }

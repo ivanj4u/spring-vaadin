@@ -1,12 +1,12 @@
 package com.aribanilia.vaadin.view;
 
-import com.aribanilia.vaadin.model.AbstractScreen;
+import com.aribanilia.vaadin.framework.AbstractScreen;
 import com.vaadin.navigator.View;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.VerticalLayout;
 
-public class TransactionView extends AbstractScreen {
+@SpringView
+public class TransactionView extends AbstractScreen implements View {
 
 
     @Override

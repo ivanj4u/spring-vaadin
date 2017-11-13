@@ -1,14 +1,19 @@
-package com.aribanilia.vaadin.model;
+/*
+ * Copyright (c) 2017.
+ */
+
+package com.aribanilia.vaadin.framework;
 
 import com.aribanilia.vaadin.loader.MenuLoader;
-import com.vaadin.navigator.View;
 import com.vaadin.server.Responsive;
 import com.vaadin.server.VaadinSession;
-import com.vaadin.spring.annotation.SpringView;
+import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.Panel;
 
-@SpringView
-public abstract class AbstractScreen extends Panel implements PriviledgeModel, View {
+import javax.annotation.PostConstruct;
+
+@UIScope
+public abstract class AbstractScreen extends Panel implements PriviledgeModel {
 
     protected boolean isInit = false;
     protected int mode = -1;
@@ -26,6 +31,7 @@ public abstract class AbstractScreen extends Panel implements PriviledgeModel, V
         this.param = param;
     }
 
+    @PostConstruct
     public void show() {
         if (isInit) {
             onShow();

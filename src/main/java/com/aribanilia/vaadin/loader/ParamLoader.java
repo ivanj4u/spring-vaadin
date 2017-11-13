@@ -1,9 +1,9 @@
 package com.aribanilia.vaadin.loader;
 
 import com.aribanilia.vaadin.entity.TblParam;
-import com.aribanilia.vaadin.framework.HibernateUtil;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+import com.aribanilia.vaadin.framework.db.hibernate.Session;
+import com.aribanilia.vaadin.framework.db.hibernate.Transaction;
+import com.aribanilia.vaadin.framework.db.plugin.PersistentPlugin;
 
 import java.util.Date;
 import java.util.List;
@@ -18,7 +18,7 @@ public class ParamLoader {
         h.clear();
         Session session = null;
         try {
-            session = HibernateUtil.getSessionFactory().openSession();
+            session = PersistentPlugin.getSessionFactory().openSession();
             List<TblParam> list = session.createCriteria(TblParam.class).list();
             for (TblParam param : list)
                 h.put(param.getKey(), param);
@@ -71,9 +71,9 @@ public class ParamLoader {
         Session session = null;
         Transaction trx = null;
         try {
-            session = HibernateUtil.getSessionFactory().openSession();
+            session = PersistentPlugin.getSessionFactory().openSession();
             trx = session.beginTransaction();
-            TblParam param = session.get(TblParam.class, key);
+            TblParam param = (TblParam) session.get(TblParam.class, key);
             param.setValue(value);
             param.setUpdateDate(new Date());
             session.update(param);
@@ -92,9 +92,9 @@ public class ParamLoader {
         Session session = null;
         Transaction trx = null;
         try {
-            session = HibernateUtil.getSessionFactory().openSession();
+            session = PersistentPlugin.getSessionFactory().openSession();
             trx = session.beginTransaction();
-            TblParam param = session.get(TblParam.class, key);
+            TblParam param = (TblParam) session.get(TblParam.class, key);
             param.setValue(value);
             param.setDescription(description);
             param.setUpdateDate(new Date());
@@ -116,7 +116,7 @@ public class ParamLoader {
             return param;
         Session session = null;
         try {
-            session = HibernateUtil.getSessionFactory().openSession();
+            session = PersistentPlugin.getSessionFactory().openSession();
             param = (TblParam) session.get(TblParam.class, key);
             h.put(key, param);
             return param;
