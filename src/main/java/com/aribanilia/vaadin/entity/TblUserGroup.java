@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "tbl_user_group", schema = "vaadin")
+@Table(name = "tbl_user_group", schema = "spring_vaadin")
 @IdClass(TblUserGroupId.class)
 public class TblUserGroup extends AuditTrail implements Serializable {
 

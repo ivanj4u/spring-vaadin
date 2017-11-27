@@ -5,7 +5,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Entity
-@Table(name = "tbl_user", schema = "vaadin")
+@Table(name = "tbl_user", schema = "spring_vaadin")
 public class TblUser extends AuditTrail implements Serializable {
 
     @Id @Column(name = "username", length = 20, nullable = false)

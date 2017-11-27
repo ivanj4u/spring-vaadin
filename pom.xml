@@ -23,7 +23,15 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
 		<vaadin.version>8.1.0</vaadin.version>
+		<vaadin.widgetset.mode>local</vaadin.widgetset.mode>
 	</properties>
+
+	<repositories>
+		<repository>
+			<id>vaadin-addons</id>
+			<url>http://maven.vaadin.com/vaadin-addons</url>
+		</repository>
+	</repositories>
 
 	<dependencies>
 		<!-- Spring -->
@@ -60,6 +68,26 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<!-- Vaadin Component -->
+		<dependency>
+			<groupId>org.vaadin.addon</groupId>
+			<artifactId>confirmdialog</artifactId>
+			<version>3.2.0</version>
+		</dependency>
+		<!--
+		<dependency>
+			<groupId>de.steinwedel.vaadin.addon</groupId>
+			<artifactId>messagebox</artifactId>
+			<version>4.0.21</version>
+		</dependency>
+		-->
+		<dependency>
+			<groupId>org.vaadin.addons</groupId>
+			<artifactId>pagedtable</artifactId>
+			<version>0.7.0</version>
+		</dependency>
+
 	</dependencies>
 
 	<dependencyManagement>
@@ -79,6 +107,11 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>com.vaadin</groupId>
+				<artifactId>vaadin-maven-plugin</artifactId>
+				<version>${vaadin.version}</version>
 			</plugin>
 		</plugins>
 	</build>

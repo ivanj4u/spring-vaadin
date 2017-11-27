@@ -7,7 +7,7 @@ import javax.persistence.Table;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "tbl_menu", schema = "vaadin")
+@Table(name = "tbl_menu", schema = "spring_vaadin")
 public class TblMenu implements Serializable {
 
     @Id
@@ -17,12 +17,8 @@ public class TblMenu implements Serializable {
     private String menuName;
     @Column(name = "menu_class")
     private String menuClass;
-    @Column(name = "parent_id", nullable = false)
-    private long parentId;
     @Column(name = "position", length = 5)
     private Long position;
-    @Column(name = "have_child", length = 2)
-    private String haveChild;
     @Column(name = "param", length = 200)
     private String param;
 
@@ -53,28 +49,12 @@ public class TblMenu implements Serializable {
         this.menuClass = menuClass;
     }
 
-    public long getParentId() {
-        return parentId;
-    }
-
-    public void setParentId(long parentId) {
-        this.parentId = parentId;
-    }
-
     public Long getPosition() {
         return position;
     }
 
     public void setPosition(Long position) {
         this.position = position;
-    }
-
-    public String getHaveChild() {
-        return haveChild;
-    }
-
-    public void setHaveChild(String haveChild) {
-        this.haveChild = haveChild;
     }
 
     public String getParam() {

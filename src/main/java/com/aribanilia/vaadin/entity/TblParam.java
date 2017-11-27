@@ -7,7 +7,7 @@ import javax.persistence.Table;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "tbl_param", schema = "vaadin")
+@Table(name = "tbl_param", schema = "spring_vaadin")
 public class TblParam extends AuditTrail implements Serializable {
 
     @Id

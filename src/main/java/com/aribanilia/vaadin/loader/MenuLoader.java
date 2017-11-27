@@ -4,13 +4,15 @@ import com.aribanilia.vaadin.entity.TblMenu;
 import com.aribanilia.vaadin.entity.TblPriviledge;
 import com.aribanilia.vaadin.entity.TblUser;
 import com.aribanilia.vaadin.entity.TblUserGroup;
-import com.aribanilia.vaadin.framework.AbstractScreen;
+import com.aribanilia.vaadin.framework.impl.AbstractScreen;
 import com.aribanilia.vaadin.framework.LoginUtil;
 import com.aribanilia.vaadin.framework.db.hibernate.Criteria;
 import com.aribanilia.vaadin.framework.db.hibernate.Session;
 import com.aribanilia.vaadin.framework.db.plugin.PersistentPlugin;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Notification;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,17 +22,19 @@ public class MenuLoader {
     private Vector<TblMenu> vSessionedPerUser = new Vector<>();
     private ConcurrentHashMap<String, AbstractScreen> cacheClass = new ConcurrentHashMap<>();
 
+    private static final Logger logger = LoggerFactory.getLogger(MenuLoader.class);
+
     @SuppressWarnings("unchecked")
     public static void load() {
         Session session = null;
         try {
             session = PersistentPlugin.getSessionFactory().openSession();
             Criteria criteria = session.createCriteria(TblMenu.class);
-            List<TblMenu> list = criteria.addOrderBy("parentId").addOrderBy("position").list();
+            List<TblMenu> list = criteria.addOrderBy("position").list();
             v.clear();
             v.addAll(list);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
         } finally {
             if (session != null && session.isOpen()) {
                 session.close();
@@ -41,8 +45,6 @@ public class MenuLoader {
     public AbstractScreen getScreen(String menuId) throws InstantiationException, IllegalAccessException, ClassNotFoundException {
         for (TblMenu menu : v) {
             if (menu.getMenuId().equals(menuId)) {
-                if (menu.getMenuClass() == null || menu.getHaveChild().equals("1"))
-                    return null;
                 TblUser user = VaadinSession.getCurrent().getAttribute(TblUser.class);
                 String sessionId = VaadinSession.getCurrent().getSession().getId();
                 if (!LoginUtil.sessionCheck(user.getUsername(), sessionId)) {

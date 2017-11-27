@@ -7,7 +7,7 @@ import javax.persistence.Table;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "tbl_group", schema = "vaadin")
+@Table(name = "tbl_group", schema = "spring_vaadin")
 public class TblGroup extends AuditTrail implements Serializable {
 
     @Id @Column(name = "group_id", length = 20, nullable = false)

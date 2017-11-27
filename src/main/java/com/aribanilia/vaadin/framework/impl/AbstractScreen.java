@@ -2,17 +2,14 @@
  * Copyright (c) 2017.
  */
 
-package com.aribanilia.vaadin.framework;
+package com.aribanilia.vaadin.framework.impl;
 
+import com.aribanilia.vaadin.framework.PriviledgeModel;
 import com.aribanilia.vaadin.loader.MenuLoader;
 import com.vaadin.server.Responsive;
 import com.vaadin.server.VaadinSession;
-import com.vaadin.spring.annotation.UIScope;
 import com.vaadin.ui.Panel;
 
-import javax.annotation.PostConstruct;
-
-@UIScope
 public abstract class AbstractScreen extends Panel implements PriviledgeModel {
 
     protected boolean isInit = false;
@@ -31,14 +28,12 @@ public abstract class AbstractScreen extends Panel implements PriviledgeModel {
         this.param = param;
     }
 
-    @PostConstruct
     public void show() {
         if (isInit) {
             onShow();
             return;
         }
         isInit = true;
-        setContent(null);
         setWidth(100, Unit.PERCENTAGE);
         setSizeFull();
         beforeInitComponent();

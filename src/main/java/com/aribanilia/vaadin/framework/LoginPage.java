@@ -136,8 +136,8 @@ public class LoginPage extends VerticalLayout implements View {
                         showFailedLogin("Login Gagal!. Username atau Password yang anda masukkan salah!");
                     }
                 } else {
-                    logger.error("User : " + user.getUsername() + " tidak ditemukan!");
-                    showFailedLogin("User : " + user.getUsername() + " tidak ditemukan!");
+                    logger.error("User : " + txtUsername.getValue() + " tidak ditemukan!");
+                    showFailedLogin("User : " + txtUsername.getValue() + " tidak ditemukan!");
                 }
             } catch (Exception e) {
                 if (session != null && session.isOpen())

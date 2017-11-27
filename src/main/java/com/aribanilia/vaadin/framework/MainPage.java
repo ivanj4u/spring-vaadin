@@ -5,6 +5,7 @@
 package com.aribanilia.vaadin.framework;
 
 import com.aribanilia.vaadin.entity.TblUser;
+import com.aribanilia.vaadin.framework.impl.AbstractScreen;
 import com.aribanilia.vaadin.loader.MenuLoader;
 import com.aribanilia.vaadin.view.LandingView;
 import com.vaadin.navigator.View;
@@ -24,6 +25,7 @@ import javax.annotation.PostConstruct;
 @SpringView(name = MainPage.VIEW_NAME)
 public class MainPage extends HorizontalLayout implements View {
     private Panel content;
+    private LandingView landingView;
 
     public static final String VIEW_NAME = "main";
     private static final Logger logger = LoggerFactory.getLogger(MainPage.class);
@@ -37,6 +39,7 @@ public class MainPage extends HorizontalLayout implements View {
         setSpacing(false);
 
         this.content = new Panel();
+        this.landingView = new LandingView();
         content.addStyleName("view-content");
         content.setSizeFull();
 
@@ -67,7 +70,8 @@ public class MainPage extends HorizontalLayout implements View {
             return;
         }
         if (event.getParameters() == null || event.getParameters().isEmpty()) {
-            content.setContent(new LandingView());
+            landingView.show();
+            content.setContent(landingView);
         } else {
             try {
                 MenuLoader menuLoader = VaadinSession.getCurrent().getAttribute(MenuLoader.class);

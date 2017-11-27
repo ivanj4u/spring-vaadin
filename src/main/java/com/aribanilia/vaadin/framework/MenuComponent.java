@@ -6,6 +6,7 @@ package com.aribanilia.vaadin.framework;
 
 import com.aribanilia.vaadin.entity.TblMenu;
 import com.aribanilia.vaadin.entity.TblUser;
+import com.aribanilia.vaadin.framework.impl.AbstractScreen;
 import com.aribanilia.vaadin.loader.MenuLoader;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.ThemeResource;
@@ -16,11 +17,8 @@ import com.vaadin.ui.themes.ValoTheme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-
 public class MenuComponent extends CustomComponent {
     private MenuBar.MenuItem settingsItem;
-    private HashMap<String, MenuItemComponent> hMenu = new HashMap<>();
 
     private static final Logger logger = LoggerFactory.getLogger(MenuComponent.class);
     private static final String ID = "menu";
@@ -52,7 +50,7 @@ public class MenuComponent extends CustomComponent {
     }
 
     private Component buildTitle() {
-        Label logo = new Label("QuickTickets <strong>Dashboard</strong>",
+        Label logo = new Label("Spring <strong>Vaadin</strong>",
                 ContentMode.HTML);
         logo.setSizeUndefined();
         HorizontalLayout logoWrapper = new HorizontalLayout(logo);
@@ -71,7 +69,7 @@ public class MenuComponent extends CustomComponent {
         settings.addStyleName("user-menu");
         final TblUser user = getCurrentUser();
         settingsItem = settings.addItem("",
-                new ThemeResource("img/profile-pic-300px.jpg"), null);
+                new ThemeResource("img/logo.jpg"), null);
         settingsItem.addItem("Edit Profile", (MenuBar.Command) selectedItem -> {
 //                ProfilePreferencesWindow.open(user, false);
             Notification.show("Edit Profile Clicked");
@@ -108,7 +106,6 @@ public class MenuComponent extends CustomComponent {
         CssLayout menuItemsLayout = new CssLayout();
         menuItemsLayout.addStyleName(ValoTheme.MENU_ITEM);
         try {
-            hMenu.clear();
             MenuLoader menuLoader = VaadinSession.getCurrent().getAttribute(MenuLoader.class);
             for (final TblMenu view : menuLoader.getAuthorizedMenu()) {
                 AbstractScreen screen = menuLoader.getScreen(view.getMenuId());
@@ -120,16 +117,9 @@ public class MenuComponent extends CustomComponent {
                 menu.setPrimaryStyleName(ValoTheme.MENU_ITEM);
                 menu.setCaption(view.getMenuName().substring(0, 1).toUpperCase()
                         + view.getMenuName().substring(1));
-                if (view.getHaveChild().equals("1")) {
-                    MenuItemComponent itemComponent = new MenuItemComponent(view.getMenuId());
-                    hMenu.put(view.getMenuId(), itemComponent);
-                } else {
-                    MenuItemComponent itemComponent = hMenu.get(view.getParentId());
-
-                    menu.addClickListener(event -> {
-                        getUI().getNavigator().navigateTo(MainPage.VIEW_NAME + "/" + view.getMenuId());
-                    });
-                }
+                menu.addClickListener(event -> {
+                    getUI().getNavigator().navigateTo(MainPage.VIEW_NAME + "/" + view.getMenuId());
+                });
                 menuItemsLayout.addComponent(menu);
             }
         } catch (Exception e) {
@@ -145,21 +135,4 @@ public class MenuComponent extends CustomComponent {
         super.attach();
     }
 
-    private class MenuItemComponent extends CssLayout {
-        private boolean isExpanded;
-
-        public MenuItemComponent(String id) {
-            super();
-            setId(id);
-            addStyleName(ValoTheme.MENU_ITEM);
-        }
-
-        public boolean isExpanded() {
-            return isExpanded;
-        }
-
-        public void setExpanded(boolean visible) {
-            isExpanded = visible;
-        }
-    }
 }

@@ -16,4 +16,11 @@ public class ValidationHelper {
         }
         return true;
     }
+
+    public static boolean validateFieldWithoutWarn(AbstractField field) {
+        if (field.getValue() == null || field.getValue().toString().equals("")) {
+            return false;
+        }
+        return true;
+    }
 }

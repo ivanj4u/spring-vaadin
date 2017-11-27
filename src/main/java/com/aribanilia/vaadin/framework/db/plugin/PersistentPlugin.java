@@ -6,7 +6,7 @@ package com.aribanilia.vaadin.framework.db.plugin;
 
 import com.aribanilia.vaadin.framework.db.hibernate.SessionFactory;
 import com.aribanilia.vaadin.framework.properties.AppConfig;
-import com.aribanilia.vaadin.util.Constants;
+import com.aribanilia.vaadin.framework.constants.Constants;
 
 public class PersistentPlugin {
 

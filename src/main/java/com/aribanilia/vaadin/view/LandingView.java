@@ -4,7 +4,7 @@
 
 package com.aribanilia.vaadin.view;
 
-import com.aribanilia.vaadin.framework.AbstractScreen;
+import com.aribanilia.vaadin.framework.impl.AbstractScreen;
 import com.vaadin.navigator.View;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Label;
