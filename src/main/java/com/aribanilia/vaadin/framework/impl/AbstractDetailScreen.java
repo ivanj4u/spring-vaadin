@@ -4,11 +4,9 @@
 
 package com.aribanilia.vaadin.framework.impl;
 
-import com.aribanilia.vaadin.framework.constants.Constants;
 import com.aribanilia.vaadin.framework.listener.DetailCallbackListener;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
-import org.vaadin.dialogs.ConfirmDialog;
 
 public abstract class AbstractDetailScreen extends AbstractScreen {
 
@@ -34,12 +32,7 @@ public abstract class AbstractDetailScreen extends AbstractScreen {
         buttonBar.addComponent(btnCancel = new Button("Batal"));
 
         btnSave.addListener(event -> {
-            ConfirmDialog.show(getUI(), Constants.CAPTION_MESSAGE.CONFIRM,
-                    Constants.CAPTION_MESSAGE.QUESTION_SAVE, "Ya", "Tidak", confirmDialog -> {
-                        if (confirmDialog.isConfirmed()) {
-                            doSave();
-                        }
-                    });
+            doSave();
         });
 
         btnCancel.addListener(event -> {

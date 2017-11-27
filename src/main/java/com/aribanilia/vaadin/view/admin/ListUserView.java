@@ -15,18 +15,23 @@ import com.aribanilia.vaadin.framework.impl.AbstractSearchScreen;
 import com.aribanilia.vaadin.util.ValidationHelper;
 import com.vaadin.navigator.View;
 import com.vaadin.spring.annotation.SpringView;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.Grid;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.TextField;
-import com.vaadin.v7.data.Item;
-import com.vaadin.v7.data.util.IndexedContainer;
+import com.vaadin.ui.themes.ValoTheme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @SpringView
 public class ListUserView extends AbstractSearchScreen implements View {
     private TextField txtUsername, txtName;
+
+    private Grid<TblUser> table;
+    private List<TblUser> list = new ArrayList<>();
 
     private AbstractDetailScreen detailScreen;
 
@@ -56,18 +61,26 @@ public class ListUserView extends AbstractSearchScreen implements View {
     }
 
     @Override
-    protected void initIndexedContainer() {
-        indexedContainer = new IndexedContainer();
-        indexedContainer.addContainerProperty(USERNAME, String.class, null);
-        indexedContainer.addContainerProperty(NAME, String.class, null);
-        indexedContainer.addContainerProperty(EMAIL, String.class, null);
-        indexedContainer.addContainerProperty(TELP, String.class, null);
+    protected Component initTableData() {
+        table = new Grid<>();
+        table.setItems(list);
+        table.setSelectionMode(Grid.SelectionMode.SINGLE);
+        table.addStyleName(ValoTheme.TABLE_COMPACT);
+        table.setWidth("100%");
+
+        table.addColumn(TblUser::getUsername).setCaption(USERNAME);
+        table.addColumn(TblUser::getName).setCaption(NAME);
+        table.addColumn(TblUser::getEmail).setCaption(EMAIL);
+        table.addColumn(TblUser::getPhone).setCaption(TELP);
+
+        return table;
     }
 
     @Override
-    protected Object getTableId() {
-        return USERNAME;
+    protected int getTableSize() {
+        return list.size();
     }
+
 
     @Override
     protected AbstractDetailScreen getDetailScreen() {
@@ -102,19 +115,15 @@ public class ListUserView extends AbstractSearchScreen implements View {
     protected void doSearch() {
         Session session = null;
         try {
-            indexedContainer.removeAllItems();
             session = PersistentPlugin.getSessionFactory().openSession();
             Criteria criteria = session.createCriteria(TblUser.class);
             if (ValidationHelper.validateFieldWithoutWarn(txtUsername))
                 criteria.addRestriction(criteria.getRestriction().eq("username", txtUsername.getValue()));
             if (ValidationHelper.validateFieldWithoutWarn(txtName))
                 criteria.addRestriction(criteria.getRestriction().like("username", "%" + txtName.getValue() + "%"));
-            List<TblUser> list = criteria.list();
+            list = criteria.list();
             session.close();
-            for (TblUser user : list) {
-                parsToTable(indexedContainer.addItem(), user);
-            }
-            table.refreshRowCache();
+            table.setItems(list);
             setRowId(null);
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -125,21 +134,14 @@ public class ListUserView extends AbstractSearchScreen implements View {
         }
     }
 
-    private void parsToTable(Object itemId, TblUser user) {
-        Item item = indexedContainer.getItem(itemId);
-        item.getItemProperty(USERNAME).setValue(user.getUsername());
-        item.getItemProperty(NAME).setValue(user.getName());
-        item.getItemProperty(EMAIL).setValue(user.getEmail());
-        item.getItemProperty(TELP).setValue(user.getPhone());
-    }
-
     @Override
     protected void doReset() {
         txtUsername.setValue("");
+        txtName.setValue("");
     }
 
     @Override
     protected boolean validateSearchRequired() {
-        return false;
+        return true;
     }
 }

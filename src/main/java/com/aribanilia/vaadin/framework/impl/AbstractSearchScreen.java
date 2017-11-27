@@ -7,19 +7,14 @@ package com.aribanilia.vaadin.framework.impl;
 import com.aribanilia.vaadin.component.NotificationHelper;
 import com.aribanilia.vaadin.framework.constants.Constants;
 import com.aribanilia.vaadin.framework.listener.DetailCallbackListener;
-import com.jensjansson.pagedtable.PagedTable;
 import com.vaadin.server.Responsive;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ValoTheme;
-import com.vaadin.v7.data.Item;
-import com.vaadin.v7.data.util.IndexedContainer;
 
 public abstract class AbstractSearchScreen extends AbstractScreen implements DetailCallbackListener {
 
     protected DetailCallbackListener listener;
     protected GridLayout grid;
-    protected PagedTable table;
-    protected IndexedContainer indexedContainer;
     protected Button btnAdd, btnEdit, btnDelete, btnView, btnSearch, btnReset, btnDetail;
     protected int row = 0;
     protected Window windowDetail = null;
@@ -43,7 +38,7 @@ public abstract class AbstractSearchScreen extends AbstractScreen implements Det
         layout.addStyleName(ValoTheme.PANEL_WELL);
 
         layout.addComponent(initPencarian());
-        layout.addComponent(initTableData());
+        layout.addComponent(initTable());
 
         setContent(layout);
         Responsive.makeResponsive(this);
@@ -70,18 +65,12 @@ public abstract class AbstractSearchScreen extends AbstractScreen implements Det
                 return;
             }
             doSearch();
-            if (indexedContainer == null)
-                return;
-            if (table.size() == 0)
-                NotificationHelper.showNotification(Constants.APP_MESSAGE.INFO_DATA_NOT_EXIST);
 
-            table.setCurrentPage(1);
+            if (getTableSize() == 0)
+                NotificationHelper.showNotification(Constants.APP_MESSAGE.INFO_DATA_NOT_EXIST);
         });
 
         btnReset.addListener(event -> {
-            indexedContainer.removeAllItems();
-            table.removeAllItems();
-            table.refreshRowCache();
             doReset();
         });
 
@@ -93,7 +82,7 @@ public abstract class AbstractSearchScreen extends AbstractScreen implements Det
         return panel;
     }
 
-    protected Panel initTableData() {
+    protected Panel initTable() {
         Panel panel = new Panel("Hasil Pencarian");
         panel.addStyleName(ValoTheme.PANEL_WELL);
         panel.setSizeFull();
@@ -101,22 +90,13 @@ public abstract class AbstractSearchScreen extends AbstractScreen implements Det
         VerticalLayout layout = new VerticalLayout();
         layout.setSizeFull();
         layout.setMargin(true);
-        initIndexedContainer();
 
-        table = new PagedTable(null);
-        table.addStyleName(ValoTheme.TABLE_COMPACT);
-        table.setWidth("100%");
-        table.setSelectable(true);
-        table.setImmediate(false);
-
-        initSetAlignmentTable();
         initButtonDetailScreen();
 
         layout.addComponent(buttonDetail);
-        layout.addComponent(table);
-        layout.addComponent(table.createControls());
+        layout.addComponent(initTableData());
         layout.setComponentAlignment(buttonDetail, Alignment.MIDDLE_RIGHT);
-        layout.setExpandRatio(table, 1.0f);
+        layout.setExpandRatio(layout.getComponent(1), 1.0f);
 
         initTotalDetail();
         if (totalDetail != null)
@@ -201,8 +181,7 @@ public abstract class AbstractSearchScreen extends AbstractScreen implements Det
         }
         getDetailScreen().setMode(Constants.APP_MODE.MODE_UPDATE);
         showDetailScreen();
-        Item item = table.getItem(getRowId());
-        getDetailScreen().setContentById(item.getItemProperty(getTableId()));
+        getDetailScreen().setContentById(getRowId());
     }
 
     protected void doView() {
@@ -212,8 +191,7 @@ public abstract class AbstractSearchScreen extends AbstractScreen implements Det
         }
         getDetailScreen().setMode(Constants.APP_MODE.MODE_VIEW);
         showDetailScreen();
-        Item item = table.getItem(getRowId());
-        getDetailScreen().setContentById(item.getItemProperty(getTableId()));
+        getDetailScreen().setContentById(getRowId());
     }
 
     protected void doDelete() {
@@ -239,12 +217,6 @@ public abstract class AbstractSearchScreen extends AbstractScreen implements Det
     @Override
     public void setModeView() {
 
-    }
-
-    @Override
-    protected void afterInitComponent() {
-        if (table != null)
-            table.setPageLength(10);
     }
 
     @Override
@@ -281,8 +253,8 @@ public abstract class AbstractSearchScreen extends AbstractScreen implements Det
     protected abstract int getGridColumn();
     protected abstract int getGridRow();
     protected abstract void initGridComponent();
-    protected abstract void initIndexedContainer();
-    protected abstract Object getTableId();
+    protected abstract Component initTableData();
+    protected abstract int getTableSize();
 
     protected abstract AbstractDetailScreen getDetailScreen();
     protected abstract String getDetailScreenTitle();

@@ -70,23 +70,23 @@
 		</dependency>
 
 		<!-- Vaadin Component -->
+		<!--
 		<dependency>
 			<groupId>org.vaadin.addon</groupId>
 			<artifactId>confirmdialog</artifactId>
 			<version>3.2.0</version>
 		</dependency>
-		<!--
 		<dependency>
 			<groupId>de.steinwedel.vaadin.addon</groupId>
 			<artifactId>messagebox</artifactId>
 			<version>4.0.21</version>
 		</dependency>
-		-->
 		<dependency>
 			<groupId>org.vaadin.addons</groupId>
 			<artifactId>pagedtable</artifactId>
 			<version>0.7.0</version>
 		</dependency>
+		-->
 
 	</dependencies>
 
@@ -108,11 +108,13 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<!--
 			<plugin>
 				<groupId>com.vaadin</groupId>
 				<artifactId>vaadin-maven-plugin</artifactId>
 				<version>${vaadin.version}</version>
 			</plugin>
+			-->
 		</plugins>
 	</build>
 
